@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.zerock.b01.domain.Board;
 import org.zerock.b01.domain.Reply;
-import org.zerock.b01.dto.BoardListReplyCountDTO;
 
 @SpringBootTest
 @Log4j2
@@ -18,9 +17,6 @@ public class ReplyRepositoryTests {
 
     @Autowired
     private ReplyRepository replyRepository;
-
-    @Autowired
-    private BoardRepository boardRepository;
 
     @Test
     public void testInsert() {

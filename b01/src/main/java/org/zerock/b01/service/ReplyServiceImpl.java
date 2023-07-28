@@ -12,6 +12,7 @@ import org.zerock.b01.domain.Reply;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.ReplyDTO;
+import org.zerock.b01.repository.BoardRepository;
 import org.zerock.b01.repository.ReplyRepository;
 
 import java.util.List;
@@ -19,13 +20,26 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Log4j2
 public class ReplyServiceImpl implements ReplyService {
 
     private final ReplyRepository replyRepository;
 
+    private final BoardRepository boardRepository;
+
     private final ModelMapper modelMapper;
+
+    public ReplyServiceImpl(ReplyRepository replyRepository, BoardRepository boardRepository, ModelMapper modelMapper) {
+        this.replyRepository = replyRepository;
+        this.boardRepository = boardRepository;
+        this.modelMapper = modelMapper;
+
+        // 'bno' 필드를 'board' 필드로 매핑하기 위한 사용자 지정 매핑
+        modelMapper.createTypeMap(ReplyDTO.class, Reply.class)
+                .addMappings(mapper -> mapper.using(ctx ->
+                                boardRepository.findById((Long) ctx.getSource()).orElse(null))
+                        .map(ReplyDTO::getBno, Reply::setBoard));
+    }
     @Override
     public Long register(ReplyDTO replyDTO) {
 
