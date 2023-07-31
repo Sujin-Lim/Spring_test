@@ -4,9 +4,11 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.zerock.b01.dto.BoardDTO;
-import org.zerock.b01.dto.PageRequestDTO;
-import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 @Log4j2
@@ -36,13 +38,13 @@ public class BoardServiceTests {
 
     @Test
     public void testModify() {
-
-        //변경에 필요한 데이터 사용
         BoardDTO boardDTO = BoardDTO.builder()
                 .bno(101L)
-                .title("Updated....101")
-                .content("Updated content 101...")
+                .title("Update..101")
+                .content("Update content 101..")
                 .build();
+
+        boardDTO.setFileNames(Arrays.asList(UUID.randomUUID() + "_zzz.jpg"));
 
         boardService.modify(boardDTO);
     }
@@ -62,5 +64,75 @@ public class BoardServiceTests {
         log.info(responseDTO);
 
     }
+
+    @Test
+    public void testRegisterWithImages(){
+
+        log.info(boardService.getClass().getName());
+
+        BoardDTO boardDTO = BoardDTO.builder()
+                .title("File.....Sample Title..")
+                .content("Sample Content..")
+                .writer("user00")
+                .build();
+
+        boardDTO.setFileNames(
+                Arrays.asList(
+                        UUID.randomUUID()+"_aaa.jpg",
+                        UUID.randomUUID()+"_bbb.jpg",
+                        UUID.randomUUID()+"_bbb.jpg"
+                ));
+        Long bno = boardService.register(boardDTO);
+
+        log.info("bno: " + bno);
+    }
+
+    @Test
+    public void testReadAll() {
+
+        Long bno = 101L;
+
+        BoardDTO boardDTO = boardService.readOne(bno);
+
+        log.info(boardDTO);
+
+        for (String fileName : boardDTO.getFileNames()) {
+            log.info(fileName);
+        }
+    }
+
+    @Test
+    public void testRemoveAll() {
+
+        Long bno = 1L;
+
+        boardService.remove(bno);
+    }
+
+    @Test
+    public void testListWithAll() {
+
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .page(1)
+                .size(10)
+                .build();
+
+        PageResponseDTO<BoardListAllDTO> responseDTO = boardService.listWithAll(pageRequestDTO);
+
+        List<BoardListAllDTO> dtoList = responseDTO.getDtoList();
+
+        dtoList.forEach(boardListAllDTO -> {
+            log.info(boardListAllDTO.getBno() + ":" + boardListAllDTO.getTitle());
+
+            if (boardListAllDTO.getBoardImages() != null) {
+                for (BoardImageDTO boardImage : boardListAllDTO.getBoardImages()) {
+                    log.info(boardImage);
+                }
+            }
+            log.info("---------------");
+        });
+    }
+
+
 
 }

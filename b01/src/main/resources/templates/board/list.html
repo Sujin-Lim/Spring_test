@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/basic.html}" lang="kr" >
+      layout:decorate="~{layout/basic.html}">
 
 <div layout:fragment="content">
 
@@ -30,6 +30,7 @@
     </form>
   </div>
 
+
   <div class="row mt-3">
     <div class="col">
 
@@ -51,19 +52,21 @@
             </thead>
 
             <tbody th:with="link = ${pageRequestDTO.getLink()}">
-
             <tr th:each="dto:${responseDTO.dtoList}"  >
-              <th scope="row">[[${dto.bno}]]</th>
+              <td>[[${dto.bno}]]</td>
               <td>
                 <a th:href="|@{/board/read(bno =${dto.bno})}&${link}|" class="text-decoration-none"> [[${dto.title}]] </a>
                 <span class="badge progress-bar-success" style="background-color: #0a53be">[[${dto.replyCount}]]</span>
+                <div th:if="${dto.boardImages != null && dto.boardImages.size() > 0}">
+                  <img style="width:100px" th:each="boarImage: ${dto.boardImages}" th:src="|/view/s_${boarImage.uuid}_${boarImage.fileName}|">
+                </div>
               </td>
               <td>[[${dto.writer}]]</td>
               <td>[[${#temporals.format(dto.regDate, 'yyyy-MM-dd')}]]</td>
             </tr>
-
-
             </tbody>
+
+
           </table>
 
           <div class="float-end">
@@ -84,6 +87,8 @@
               </li>
             </ul>
           </div>
+
+
         </div><!--end card body-->
       </div><!--end card-->
     </div><!-- end col-->
@@ -107,13 +112,9 @@
     </div>
   </div>
 
+
 </div>
 
-<script layout:fragment="script" th:inline="javascript">
-
-  console.log("script test .............")
-
-</script>
 
 <script layout:fragment="script" th:inline="javascript">
 
@@ -145,12 +146,15 @@
 
   },false)
 
+  //show modal
   const result = [[${result}]]
 
   const modal = new bootstrap.Modal(document.querySelector(".modal"))
 
-  if (result){
+  if(result){
     modal.show()
   }
+
+
 
 </script>
