@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -43,6 +44,7 @@ public class BoardController {
         model.addAttribute("responseDTO", responseDTO);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/register")
     public void registerGET() {
 
@@ -69,6 +71,7 @@ public class BoardController {
         return "redirect:/board/list";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping({"/read", "/modify"})
     public void read(Long bno, PageRequestDTO pageRequestDTO, Model model) {
 
@@ -79,8 +82,9 @@ public class BoardController {
         model.addAttribute("dto", boardDTO);
     }
 
+    @PreAuthorize("principal.username == #boardDTO.writer")
     @PostMapping("/modify")
-    public String modify(PageRequestDTO pageRequestDTO, @Valid BoardDTO boardDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String modify(@Valid BoardDTO boardDTO, BindingResult bindingResult, PageRequestDTO pageRequestDTO, RedirectAttributes redirectAttributes) {
 
         log.info("board modify post........" + boardDTO);
 
@@ -105,6 +109,7 @@ public class BoardController {
         return "redirect:/board/read";
     }
 
+    @PreAuthorize("principal.username == #boardDTO.writer")
     @PostMapping("/remove")
     public String remove(BoardDTO boardDTO, RedirectAttributes redirectAttributes) {
 
